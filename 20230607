@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>네부게이션</title>
+  <style> /* 글씨체는 임시, 지도도 임시 */
+    @import url('https://fonts.googleapis.com/css2?family=Sunflower:wght@300&display=swap');
+
+    h1 {
+      font-size: 60px;
+      font-weight: bold;
+      font-family: 'Sunflower', sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      font-size: 50px;
+      font-family: 'Sunflower', sans-serif;
+    }
+    h3 {
+      font-size: 40px;
+      font-family: 'Sunflower', sans-serif;
+    }
+    .button1 {
+      font-size: 25px;
+    }
+    .button2 {
+      font-size: 30px;
+    }
+    .button3 {
+      font-size: 25px;
+    }
+    .button4 {
+      font-size: 30px;
+    }   
+    dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+    dialog {
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+      border: 0px;
+      text-align: center;
+      border-radius: 20px;
+      padding: 20px 50px 10px 50px
+    }
+    .font1 {
+      font-family: 'Sunflower', sans-serif;
+      font-size: 35px
+    }
+    .font2 {
+      font-family: 'Sunflower', sans-serif;
+      font-size: 25px;
+    }
+    .font_sun {
+      font-family: 'Sunflower', sans-serif;
+    }
+    a {
+      text-decoration-line: none;
+      color:black;
+      
+    }
+    .button {
+      background-color:rgba(189, 219, 239, 0.502);
+      border-width: 1px;
+      
+    }/*rgb(177, 212, 247) rgba(189, 219, 239, 0.502)*/
+    .margin1 {
+      margin-left: 500px;
+    }
+    .margin2 {
+      margin-left: 500px;
+    }
+    .multi-accordion {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: .5em .5em 0;
+        overflow: hidden;
+        background-color: rgb(252, 252, 252);
+        line-height:1.5;
+    }
+    .multi-accordion summary {
+        font-weight: bold;
+        margin: -.5em -.5em 0;
+        padding: .5em;
+        cursor: pointer;
+    }
+    /* 둥근 테두리인 첫 번째 아이템 상단의 배경색이 삐져 나오는 것 처리 */
+    .multi-accordion details:first-child summary{
+        border-radius: 10px 10px 0 0;
+    }
+    /* 열림 아이템 */
+    .multi-accordion details[open] summary {
+        border-bottom: 1px solid #aaa;
+        margin-bottom: .5em;
+        background-color: aliceblue;
+        letter-spacing: 0.1em;
+    }
+    /* 열린 아이템이 첫 번째 아이템이 아니면 디자인 요소 추가 */
+    .multi-accordion details:not(:first-child)[open] summary {
+        margin-top: .15em;
+        border-top: 1px solid #aaa;
+
+    }
+    /* 열림 아이템 다음 아이템의 키워드 상단에 테두리선 추가 */
+    .multi-accordion details[open] + details > summary {
+        border-top: 1px solid #aaa;
+    }
+    #building-name{
+      background-color: rgba(189, 219, 239, 0.502);
+    }
+    #building-inf{
+      background-color:#e9e8e8
+    }
+    .building_font {
+        font-size: 25px;
+        font-family: 'Sunflower', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>네부게이션</h1>
+    <button class="button1">GO</button>
+    <dialog class="button2">
+      <form method="dialog">
+      <button class="margin1">X</button>
+      <h1 class="font1">거리</h2>
+      <hr>
+      <h1 class="font1">시간</h2>
+        <button type="button" class="button">
+          <a href="#pop_info_1" class="btn_open font2" id="btn_slow">느린 걸음</a> </button>
+        <button type="button" class="button">
+          <a href="#pop_info_2" class="btn_open font2" id="btn_normal">보통 걸음</a> </button>
+        <button type="button" class="button"> 
+          <a href="#pop_info_3" class="btn_open font2" id="btn_fast">빠른 걸음</a> </button>
+        <div id="pop_info_1" class="pop_wrap" style="display:none;">
+          <div class="pop_inner">
+           <p class="dsc">걸리는 시간_slow</p>
+           <button type="button" class="btn_close">X</button>
+          </div>
+        </div>
+
+        <!-- 팝업2 -->
+        <div id="pop_info_2" class="pop_wrap" style="display:none;">
+          <div class="pop_inner">
+           <p class="dsc">걸리는 시간_regular</p>
+           <button type="button" class="btn_close">X</button>
+          </div>
+         </div>
+
+        <!-- 팝업3 -->
+          <div id="pop_info_3" class="pop_wrap" style="display:none;">
+            <div class="pop_inner">
+              <p class="dsc">걸리는 시간_fast</p>
+              <button type="button" class="btn_close">X</button>
+            </div>
+            <!--<div>
+              <input
+              onclick='toggleBtn1()'/>
+            </div>-->  <!--걸음 3개 중 X버튼 없애고 그냥 버튼만 누르는 방식 하려다 실패..-->      
+      </form>
+    </dialog>
+      <button class="button3">Building info</button>
+      <dialog class="button4">
+        <form method="dialog">
+        <button class="margin2">X</button>
+        <div id = "building-name"> <h2>A12 웅비관</h2> </div>
+        <img src="images/A12.jpeg" alt="웅비관"> <!-- 사진 필요함 -->
+        <div id = "building-inf"> <h3 class="font_sun">층별안내</h3> </div> <!-- 폰트 -->
+        <div class="multi-accordion">
+          <details class="building_font">
+            <summary>지상 1층 안내</summary>
+            <p class="font2">1101 외국인초빙교수실<br>
+              1103 특강실(1)<br>
+              1103 특강실(1)<br>
+              1104 특강실(2)<br>
+              1105 특강실(3)<br>
+              1106A 특강실(4)<br>
+              1106B 특강실(5)<br>
+              1106C 특강실(6)<br>
+              1107 LAN실<br>
+              1108 특강실(7)<br>
+              1109 어학실습실(2)<br>
+              1110 음영/멀티관리실<br>
+              1111 어학실습실(3)<br>
+              1112 특강실(8)<br>
+              1113 특강실(9)<br>
+              1114 어학실습실(4)<br>
+              1115 한국어교무실<br>
+              1116 특강실(10)<br>
+              1117 특강실(11)<br>
+              1118 특강실(12)<br>
+              1119 특강실(13)<br>
+              1120 특강실(14)<br>
+              1121 특강실(15)<br>
+              1122 음영도서실<br>
+              1123 자료대출실<br>
+              1124 멀티미디어실<br>
+              1125A 어학실습실(5)<br>
+              1125B 특강실(16)<br>
+              1126A 어학학습실(6)<br>
+              1126B 특강실(17)<br>
+              X01 화장실(여)<br>
+              X02 화장실(남)<br>
+              X11 전기실<br></p>
+        </details>
+        <details class="building_font">
+            <summary>지상 2층 안내</summary>
+            <p>1201 의료기기 실험실<br>
+              1202 오정환 교수연구실<br>
+              1203 의공학과세미나실<br>
+              1204 안예찬 교수연구실<br>
+              1205 교수준비실(안예찬)<br>
+              1206 의공학과사무실<br>
+              1207 의공생체실험실<br>
+              1208 교수준비실(이명기)<br>
+              1209 이명기 교수연구실<br>
+              1210 교수연구실(강현욱)<br>
+              1211 교수준비실(강현욱)<br>
+              1212 교수연구실(정원교)<br>
+              1213 교수준비실(정원교)<br>
+              1214 교수연구실(남승윤)<br>
+              1215 교수준비실(남승윤)<br>
+              1216 의공IT실습실<br>
+              1217 메이커스페이스<br>
+              1218 러닝허브<br>
+              1222 의료영상실험실<br>
+              1224 글로벌자율전공학부 초빙교수실<br>
+              1225 나노바이오메디슨연구실<br>
+              1226 교수준비실(오정환)<br>
+              1227 의광학및생체유체연구실<br>
+              1228 Computational Biophysics LAB<br>
+              1229A Bio-Therapeutics LAB A<br>
+              1229B Bio Ablation Lab<br>
+              1230 Marine Biomedical Engineering LAB<br>
+              1231 융합재생의학연구실<br>
+              1232 글로벌자율전공학부 교수실 (오금식)<br>
+              1233 글로벌자율전공학부 전산실<br>
+              1234 글로벌자율전공학부 강의실<br>
+              1235 글로벌자율전공학부 스터디룸<br>
+              1236 글로벌자율전공학부 진로지도실<br>
+              X01 화장실(여)<br>
+              X02 화장실(남)<br>
+            </p>
+        </details>
+        <details class="building_font">
+            <summary>지상 3층 안내</summary>
+            <p>1301 교수실(김창수)<br>
+              1302 uIT 도시방재 및 공간정보연구실<br>
+              1303 uIT 도시방재 및 공간정보연구실<br>
+              1304 교수실(이경현)<br>
+              1305 정보보호및인터넷응용연구실<br>
+              1306 기자재실<br>
+              1307 학과사무실<br>
+              1308 교수실(송하주)<br>
+              1309 정보및데이터베이스시스템연구실<br>
+              1310 그래픽스및애니매이션연구실<br>
+              1311 교수실(김영봉)<br>
+              1312 교수실(신상욱)<br>
+              1313 응용암호및유비쿼터스컴퓨팅연구실<br>
+              1314 응용암호및유비쿼터스컴퓨팅연구실<br>
+              1315 교수실(권기룡)<br>
+              1316 멀티미디어통신 및 신호처리연구실<br>
+              1317 글로벌자율전공학부 세미나실<br>
+              1318 글로벌자율전공학부 사무실<br>
+              1319 교수실 (한희진)<br>
+              1319A 교수실 (이보고)<br>
+              1320 대학원강의실<br>
+              1321 세미나실(6)<br>
+              1322 논리회로실습실<br>
+              1324 MCSP Lab<br>
+              1325 멀티미디어실습실<br>
+              1326 자료실<br>
+              1327 교수실(이준엽)<br>
+              1328 폐수처리 및 자원화 실험실<br>
+              1329 폐수처리 및 자원화 연구실<br>
+              1330 수질실험실(B)<br>
+              1331 구) 물환경복원및재이용실험실<br>
+              X01 화장실(남)<br>
+              X02화장실(여)<br>
+            </p>
+        </details>
+        <details class="building_font">
+          <summary>지상 4층 안내</summary>
+          <p>
+            1401 식품공학과준비실<br>
+            1402 교수실(김선봉)<br>
+            1403 교수실(전병수)<br>
+            1404 식품공학준비실<br>
+            1405 교수실(심길보)<br>
+            1406 수산가공준비실<br>
+            1407 수산가공실험실(심길보)<br>
+            1408 식품발효공학준비실<br>
+            1409 교수실(양지영)<br>
+            1410 식품공학과 학과사무실<br>
+            1411 식품자원개발준비실<br>
+            1412 교수실(안동현)<br>
+            1413 학과도서실<br>
+            1414 식품미생물준비실<br>
+            1415 식품미생물준비실<br>
+            1416 교수실(김영목)<br>
+            1417 식품화학준비실<br>
+            1418 교수실(조승목)<br>
+            1419 교수실(이양봉)<br>
+            1420 식품생화학준비실<br>
+            1421 동결건조기실<br>
+            1422 식품공학실험실<br>
+            1423 기기분석실<br>
+            1424 식품발효공학실험실<br>
+            1425 세미나실<br>
+            1426 식품자원개발준비실<br>
+            1427 저온실<br>
+            1428 식품화학실험실<br>
+            1429 식품생화학실험실<br>
+            X01 화장실(남)<br>
+            X02 화장실(여)<br>
+          </p>
+        </details>
+        </form>
+    </dialog>
+  </header>
+</body>
+  
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>simpleMap</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=Hz2FRQ7V1LaHuZxpL92Fn7UPuG3RndEq1ENh2wA6"></script>
+<script type="text/javascript">
+   var marker_s, marker_e, marker_p1, marker_p2;
+   var totalMarkerArr = [];
+   var drawInfoArr = [];
+   var resultdrawArr = [];
+   var map, marker;
+   var start, end;
+
+   function initTmap() {
+      // 1. 지도 띄우기
+      map = new Tmapv2.Map("map_div", {
+         center: new Tmapv2.LatLng(35.13399576311834, 129.1055538706261),
+         width: "100%",
+         height: "575px",
+         zoom: 17,
+         zoomControl: true,
+         scrollwheel: true
+      });
+
+      // 2. 클릭 이벤트 등록
+      map.addListener("click", onClick);
+
+      // 3. 시작, 도착 마커 설정
+      marker_s = new Tmapv2.Marker({
+         position: new Tmapv2.LatLng(35.13537525752147, 129.10291822980423),
+         icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_s.png",
+         iconSize: new Tmapv2.Size(24, 38),
+         map: map
+      });
+
+      marker_e = new Tmapv2.Marker({
+         position: new Tmapv2.LatLng(35.13130027314456, 129.10613164272561),
+         icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_e.png",
+         iconSize: new Tmapv2.Size(24, 38),
+         map: map
+      });
+   }
+
+   function onClick(e) {
+      if (!start) {
+         start = e.latLng;
+         addMarker(start, "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_s.png");
+      } else if (!end) {
+         end = e.latLng;
+         addMarker(end, "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_e.png");
+      } else {
+         start = e.latLng;
+         marker_s.setPosition(start);
+      }
+   }
+
+   function addMarker(position, iconUrl) {
+      if (marker) {
+         marker.setMap(null);
+      }
+      marker = new Tmapv2.Marker({
+         position: position,
+         icon: iconUrl,
+         iconSize: new Tmapv2.Size(24, 38),
+         map: map
+      });
+   }
+
+   function addComma(num) {
+      var regexp = /\B(?=(\d{3})+(?!\d))/g;
+      return num.toString().replace(regexp, ',');
+   }
+
+   function drawLine(arrPoint) {
+      var polyline_ = new Tmapv2.Polyline({
+         path: arrPoint,
+         strokeColor: "#DD0000",
+         strokeWeight: 6,
+         map: map
+      });
+      resultdrawArr.push(polyline_);
+   }
+
+   function calculateRoute() {
+      if (!start || !end) {
+         alert("출발지와 도착지를 클릭해주세요.");
+         return;
+      }
+
+      var startX = start.lng();
+      var startY = start.lat();
+      var endX = end.lng();
+      var endY = end.lat();
+
+      var headers = {};
+      headers["appKey"] = "Hz2FRQ7V1LaHuZxpL92Fn7UPuG3RndEq1ENh2wA6";
+
+      $.ajax({
+         method: "POST",
+         headers: headers,
+         url: "https://apis.openapi.sk.com/tmap/routes/pedestrian?version=1&format=json&callback=result",
+         async: false,
+         data: {
+            "startX": startX,
+            "startY": startY,
+            "endX": endX,
+            "endY": endY,
+            "reqCoordType": "WGS84GEO",
+            "resCoordType": "EPSG3857",
+            "startName": "출발지",
+            "endName": "도착지"
+         },
+         success: function (response) {
+            var resultData = response.features;
+
+            // 결과 출력
+            var tDistance = "총 거리: " + ((resultData[0].properties.totalDistance) / 1000).toFixed(1) + "km,";
+            var tTime = " 총 시간: " + ((resultData[0].properties.totalTime) / 60).toFixed(0) + "분";
+
+            $("#result").text(tDistance + tTime);
+
+            // 기존 그려진 라인 & 마커 초기화
+            if (resultdrawArr.length > 0) {
+               for (var i in resultdrawArr) {
+                  resultdrawArr[i].setMap(null);
+               }
+               resultdrawArr = [];
+            }
+
+            drawInfoArr = [];
+
+            for (var i in resultData) {
+               var geometry = resultData[i].geometry;
+               var properties = resultData[i].properties;
+
+               if (geometry.type == "LineString") {
+                  for (var j in geometry.coordinates) {
+                     var latlng = new Tmapv2.Point(geometry.coordinates[j][0], geometry.coordinates[j][1]);
+                     var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(latlng);
+                     var convertChange = new Tmapv2.LatLng(convertPoint._lat, convertPoint._lng);
+                     drawInfoArr.push(convertChange);
+                  }
+               } else {
+                  var markerImg = "";
+                  var pType = "";
+                  var size;
+
+                  if (properties.pointType == "S") {
+                     markerImg = "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_s.png";
+                     pType = "S";
+                     size = new Tmapv2.Size(24, 38);
+                  } else if (properties.pointType == "E") {
+                     markerImg = "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_e.png";
+                     pType = "E";
+                     size = new Tmapv2.Size(24, 38);
+                  } else {
+                     markerImg = "http://topopen.tmap.co.kr/imgs/point.png";
+                     pType = "P";
+                     size = new Tmapv2.Size(8, 8);
+                  }
+
+                  var latlon = new Tmapv2.Point(geometry.coordinates[0], geometry.coordinates[1]);
+                  var convertPoint = new Tmapv2.Projection.convertEPSG3857ToWGS84GEO(latlon);
+
+                  var routeInfoObj = {
+                     markerImage: markerImg,
+                     lng: convertPoint._lng,
+                     lat: convertPoint._lat,
+                     pointType: pType
+                  };
+
+                  marker = new Tmapv2.Marker({
+                     position: new Tmapv2.LatLng(routeInfoObj.lat, routeInfoObj.lng),
+                     icon: routeInfoObj.markerImage,
+                     iconSize: size,
+                     map: map
+                  });
+               }
+            }
+            drawLine(drawInfoArr);
+         },
+         error: function (request, status, error) {
+            console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+         }
+      });
+   }
+
+   function initTmap() {
+      map = new Tmapv2.Map("map_div", {
+         center: new Tmapv2.LatLng(35.13399576311834, 129.1055538706261),
+         width: "100%",
+         height: "575px",
+         zoom: 17,
+         zoomControl: true,
+         scrollwheel: true
+      });
+
+      marker_s = new Tmapv2.Marker({
+         position: new Tmapv2.LatLng(35.13537525752147, 129.10291822980423),
+         icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_s.png",
+         iconSize: new Tmapv2.Size(24, 38),
+         map: map
+      });
+
+      marker_e = new Tmapv2.Marker({
+         position: new Tmapv2.LatLng(35.13130027314456, 129.10613164272561),
+         icon: "http://tmapapi.sktelecom.com/upload/tmap/marker/pin_r_m_e.png",
+         iconSize: new Tmapv2.Size(24, 38),
+         map: map
+      });
+
+      map.addListener("click", function (event) {
+         if (!start) {
+            start = event.latLng;
+            marker_s.setPosition(start);
+         } else if (!end) {
+            end = event.latLng;
+            marker_e.setPosition(end);
+            calculateRoute();
+         }
+      });
+   }
+</script>
+</head>
+<body onload="initTmap();">
+
+<!-- 190430 기존 지도를 모두 이미지 처리 위해 주석 처리 S -->
+<div id="map_wrap" class="map_wrap3">
+   <div id="map_div"></div>
+</div>
+<div class="map_act_btn_wrap clear_box"></div>
+<p id="result"></p>
+</body>
+</html>
+
+      
+
+<script>
+  const button = document.querySelector(".button1");
+  const dialog = document.querySelector(".button2");
+  const button_info = document.querySelector(".button3");
+  const dialog_info = document.querySelector(".button4");
+
+  button.addEventListener("click", () => { 
+    dialog.showModal()
+  })
+  button_info.addEventListener("click", () => {
+    dialog_info.showModal()
+  })
+  var target = document.querySelectorAll('.btn_open');
+  var btnPopClose = document.querySelectorAll('.pop_wrap .btn_close');
+  var targetID;
+
+  // 팝업 열기
+  for(var i = 0; i < target.length; i++){
+    target[i].addEventListener('click', function(){
+      targetID = this.getAttribute('href');
+      document.querySelector(targetID).style.display = 'block';
+    });
+  }
+
+  // 팝업 닫기
+  for(var j = 0; j < target.length; j++){
+    btnPopClose[j].addEventListener('click', function(){
+      this.parentNode.parentNode.style.display = 'none';
+    });
+  }
+  /*function toggleBtn1() {
+    const btn_slow = document.getElementById('btn_slow');
+    if(btn_slow.style.display !== 'none') {
+      btn_slow.style.display = 'none';
+    }
+    else {
+      btn_slow.style.display = 'block';
+    }
+  }*/  /*그냥 버튼 누르는걸로 없애는 거 시도, 실패. 다음에 다시 시도*/
+</script>
